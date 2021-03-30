@@ -24,25 +24,48 @@ that is why it's confusing.. but yeah (long blurb for nothing lol):
 
 docker run --name demographics -v C:\NHL:/mnt -p 3306:3306 -e MYSQL_ROOT_PASSWORD=rtxon -d mysql
 
-docker exec -it demographics \bin\bash
+docker exec -it demographics /bin/bash
 
 first, try mysql -u root -p
 
 if doesn't work, in docker container if can't find .sock or something, do:
 apt-get update
 apt-get install mysql-client
-
 ----------------------------------------------------------
 
 Ok great. now you can do this if all goes well...
 docker exec -it demographics mysql -u root -p
 
-* sorry shouldn't be committing massive .csv files but this is easy way lol..
+or .. if you're already in /bin/bash of docker
+mysql -u root -p
+
+Please run these commands in mysql to create the database..
+
+create database demographics;
+use demographics;
+
+quit out of the database (quit)
+install vim (apt-get install vim)
+change the file /etc/mysql/my.cnf (add this to end of file)
+
+[mysqld]
+secure_file_priv=/var/lib/mysql-files/
+
+This will allow mysql to actually run the source files from the /mnt directory (or any directory)
+
+now exit out of container (and restart it)
+
+docker stop demographics
+docker start demographics
 
 ----------------------------------------------------------
 * No guaruntees the sql works properly yet...
+* sorry shouldn't be committing massive .csv files but this is easy way lol..
 
 try to do this...
 
-cd into /mnt directory ( whereever you created -v for docker)
-source Create-Demographics.sql
+docker exec -it demographics mysql -u root -p
+
+use demographics;
+
+source /mnt/Create-Demographics.sql
