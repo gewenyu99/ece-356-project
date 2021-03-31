@@ -1,3 +1,4 @@
+use test;
 drop table if exists Users;
 drop table if exists PopulationData;
 drop table if exists PopulationDist;
@@ -60,7 +61,7 @@ load data infile '/mnt/birth_death_growth_rates.csv' ignore into table Populatio
 	lines terminated by '\n'
 	ignore 1 lines
 	(countryID, @dummy, year, birthRate, deathRate, @dummy, @dummy, @dummy);
-	
+
 -- We still need infantMortalityRate and totalPopulation
 create table TempPopulationDataOne (
 	countryID char(2),
@@ -75,10 +76,10 @@ load data infile '/mnt/midyear_population.csv' ignore into table TempPopulationD
 	lines terminated by '\n'
 	ignore 1 lines
 	(countryID, @dummy, year, population);
-		
+
 update PopulationData
-	inner join TempPopulationDataOne on 
-	PopulationData.countryID = TempPopulationDataOne.countryID 
+	inner join TempPopulationDataOne on
+	PopulationData.countryID = TempPopulationDataOne.countryID
 	and PopulationData.year = TempPopulationDataOne.year
 set
 	PopulationData.totalPopulation = TempPopulationDataOne.population;
@@ -96,21 +97,21 @@ load data infile '/mnt/mortality_life_expectancy.csv' ignore into table TempPopu
 	lines terminated by '\n'
 	ignore 1 lines
 	(countryID, @dummy, year, infantMortalityRate, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy);
-		
+
 update PopulationData
-	inner join TempPopulationDataTwo on 
-	PopulationData.countryID = TempPopulationDataTwo.countryID 
+	inner join TempPopulationDataTwo on
+	PopulationData.countryID = TempPopulationDataTwo.countryID
 	and PopulationData.year = TempPopulationDataTwo.year
 set
 	PopulationData.infantMortalityRate = TempPopulationDataTwo.infantMortalityRate;
-	
+
 drop table TempPopulationDataOne;
 drop table TempPopulationDataTwo;
 
--- 
--- 
+--
+--
 -- :)
--- 
+--
 --
 
 -- Please run python3 fix_population.py
@@ -129,11 +130,11 @@ load data infile '/mnt/population_results.csv' ignore into table PopulationDist
 	lines terminated by '\n'
 	ignore 0 lines
 	(countryID, year, age, population);
-	
--- 
--- 
+
+--
+--
 -- :)
--- 
+--
 --
 
 create table PopulationDist_5YearRange (
@@ -151,10 +152,10 @@ load data infile '/mnt/midyear_population_5yr_age_sex.csv' ignore into table Pop
 	ignore 0 lines
 	(countryID, @dummy, year, @dummy, startAge, @dummy, @dummy, population, @dummy, @dummy);
 
--- 
--- 
+--
+--
 -- :)
--- 
+--
 --
 
 -- Qol
