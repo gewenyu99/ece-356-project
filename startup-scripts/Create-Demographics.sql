@@ -1,4 +1,4 @@
-use test;
+use demographics;
 drop table if exists Users;
 drop table if exists PopulationData;
 drop table if exists PopulationDist;
