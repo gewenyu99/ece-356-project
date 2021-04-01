@@ -2,15 +2,11 @@ package com.ece356.demographics.controller;
 
 import com.ece356.demographics.dao.CountryDao;
 import com.ece356.demographics.model.Country;
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jdbi.v3.core.Jdbi;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
 import java.util.List;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
@@ -22,9 +18,9 @@ public class CountryController {
 
     private Jdbi jdbi;
 
-    public CountryController(Jdbi jdbi){
+    public CountryController(Jdbi jdbi) {
         this.jdbi = jdbi;
-        jdbi.useExtension(CountryDao.class,CountryDao::listCountries);
+        jdbi.useExtension(CountryDao.class, CountryDao::listCountries);
     }
 
     @RequestMapping(value = "/country", method = GET)

@@ -10,7 +10,7 @@ import javax.sql.DataSource;
 @Configuration
 public class JdbiConfiguration {
     @Bean
-    public Jdbi jdbi(DataSource dataSource){
+    public Jdbi jdbi(DataSource dataSource) {
         return Jdbi.create(dataSource)
                 .installPlugin(new SqlObjectPlugin());
     }
