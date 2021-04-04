@@ -20,7 +20,6 @@ public class CountryController {
 
     public CountryController(Jdbi jdbi) {
         this.jdbi = jdbi;
-        jdbi.useExtension(CountryDao.class, CountryDao::listCountries);
     }
 
     @RequestMapping(value = "/country", method = GET)
