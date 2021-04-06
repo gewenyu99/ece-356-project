@@ -1,6 +1,5 @@
 package com.ece356.demographics.dao;
 
-import com.ece356.demographics.model.PopulationData;
 import com.ece356.demographics.model.PopulationDist;
 import org.jdbi.v3.sqlobject.config.RegisterBeanMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
