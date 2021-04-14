@@ -39,12 +39,12 @@ public class UserController {
         return "This endpoint is for users";
     }
 
-    @RequestMapping(value = "/users/list", method = GET)
+    @RequestMapping(value = "/read/users/list", method = GET)
     public List<User> list() {
         return jdbi.withExtension(UserDao.class, UserDao::getUsers);
     }
 
-    @RequestMapping(value = "/users/createNormalUser", method = GET)
+    @RequestMapping(value = "/create/users/createNormalUser", method = GET)
     public String createNormalUser(@RequestParam(value="username") String username,
                                  @RequestParam(value="password") String password,
                                  @RequestParam(value="isEnabled", required = false, defaultValue = "1") int isEnabled) {
@@ -53,6 +53,37 @@ public class UserController {
         jdbi.useExtension(UserDao.class, dao -> dao.createNormalUser(username, encodedPassword, isEnabled));
         jdbi.useExtension(AuthorityDao.class, dao -> dao.createUserRole(username, "ROLE_USER"));
         return "Done";
+    }
+
+    @RequestMapping(value = "/create/users/createAdminUser", method = GET)
+    public String createAdminUser(@RequestParam(value="username") String username,
+                                   @RequestParam(value="password") String password,
+                                   @RequestParam(value="isEnabled", required = false, defaultValue = "1") int isEnabled) {
+
+        String encodedPassword = SecurityConfig.passwordEncoder().encode(password);
+        jdbi.useExtension(UserDao.class, dao -> dao.createNormalUser(username, encodedPassword, isEnabled));
+        jdbi.useExtension(AuthorityDao.class, dao -> dao.createUserRole(username, "ROLE_ADMIN"));
+        return "Done";
+    }
+
+    @RequestMapping(value = "/update/users/enableUser", method = GET)
+    public String enableUser(@RequestParam(value="username") String username) {
+        jdbi.useExtension(UserDao.class, dao->dao.enableUser(username));
+        return "Enabled";
+    }
+
+    @RequestMapping(value = "/update/users/disableUser", method = GET)
+    public String disableUser(@RequestParam(value="username") String username) {
+        jdbi.useExtension(UserDao.class, dao->dao.disableUser(username));
+        return "Disabled";
+    }
+
+    @RequestMapping(value = "/update/users/password", method = GET)
+    public String resetPassword(@RequestParam(value="username") String username,
+                                @RequestParam(value="password") String password) {
+        String encodedPassword = SecurityConfig.passwordEncoder().encode(password);
+        jdbi.useExtension(UserDao.class, dao->dao.updateUserPassword(username, encodedPassword));
+        return "Disabled";
     }
 }
 

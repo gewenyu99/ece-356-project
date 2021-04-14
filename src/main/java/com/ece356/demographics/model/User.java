@@ -12,5 +12,11 @@ public class User {
     public String getPassword(){ return this.password; }
     public void setPassword(String password) { this.password = password; }
 
+    public int getEnabled() {
+        return enabled;
+    }
 
+    public void setEnabled(int enabled) {
+        this.enabled = enabled;
+    }
 }

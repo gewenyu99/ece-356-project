@@ -28,5 +28,7 @@ public interface AuthorityDao {
     @RegisterBeanMapper(User.class)
     Authority getAuthority(@Bind("username") String username);
 
+    @SqlUpdate("UPDATE authorities SET role = :role WHERE username = :username")
+    void setUserToRole(@Bind("username") String username, @Bind("role") String role);
 }
 
