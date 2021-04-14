@@ -6,8 +6,9 @@ drop table if exists users;
 drop table if exists PopulationData;
 drop table if exists PopulationDist;
 drop table if exists PopulationDist_5YearRange;
+drop table if exists tempHDI;
 drop table if exists QolData;
-drop table if exists Country;
+drop table if exists country;
 
 --
 -- 
@@ -37,19 +38,19 @@ CREATE UNIQUE INDEX ix_auth_username
 -- 
 --
 
-create table Country
+create table country
 (
-    countryID   char(2),
-    countryName char(50),
-    primary key (countryID)
+    country_id   char(2),
+    country_name char(50),
+    primary key (country_id)
 );
 
-load data infile '/mnt/country_names_area.csv' ignore into table Country
+load data infile '/mnt/country_names_area.csv' ignore into table country
     fields terminated by ','
     enclosed by '"'
     lines terminated by '\n'
     ignore 1 lines
-    (countryID, countryName, @dummy);
+    (country_id, countryName, @dummy);
 
 
 -- 
@@ -66,7 +67,7 @@ create table PopulationData
     deathRate           decimal(5, 2),
     infantMortalityRate decimal(5, 2),
     totalPopulation     int,
-    foreign key (countryID) references Country (countryID)
+    foreign key (countryID) references country (country_id)
 );
 
 load data infile '/mnt/birth_death_growth_rates.csv' ignore into table PopulationData
@@ -82,7 +83,7 @@ create table TempPopulationDataOne
     countryID  char(2),
     year       int,
     population int,
-    foreign key (countryID) references Country (countryID)
+    foreign key (countryID) references country (country_id)
 );
 
 load data infile '/mnt/midyear_population.csv' ignore into table TempPopulationDataOne
@@ -103,7 +104,7 @@ create table TempPopulationDataTwo
     countryID           char(2),
     year                int,
     infantMortalityRate int,
-    foreign key (countryID) references Country (countryID)
+    foreign key (countryID) references country (country_id)
 );
 
 load data infile '/mnt/mortality_life_expectancy.csv' ignore into table TempPopulationDataTwo
@@ -137,7 +138,7 @@ create table PopulationDist
     year       int,
     age        int,
     population int,
-    foreign key (countryID) references Country (countryID)
+    foreign key (countryID) references country (country_id)
 );
 
 load data infile '/mnt/population_results.csv' ignore into table PopulationDist
@@ -159,7 +160,7 @@ create table PopulationDist_5YearRange
     year       int,
     startAge   int,
     population int,
-    foreign key (countryID) references Country (countryID)
+    foreign key (countryID) references country (country_id)
 );
 
 load data infile '/mnt/midyear_population_5yr_age_sex.csv' ignore into table PopulationDist_5YearRange
@@ -187,7 +188,7 @@ create table QolData
     HDI             decimal(4, 3),
     lifeExpectancy  decimal(11, 8),
     survivalToAge65 decimal(10, 8),
-    foreign key (countryID) references Country (countryID)
+    foreign key (countryID) references country (country_id)
 );
 
 load data infile '/mnt/economy_results.csv' ignore into table QolData
@@ -202,7 +203,7 @@ create table tempHDI
     countryID char(2),
     year      int,
     HDI       decimal(4, 3),
-    foreign key (countryID) references Country (countryID)
+    foreign key (countryID) references country (country_id)
 );
 
 load data infile '/mnt/hdi_results.csv' ignore into table tempHDI
