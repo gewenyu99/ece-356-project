@@ -4,6 +4,7 @@ import com.ece356.demographics.DemographicsApplication;
 
 import com.ece356.demographics.dao.AuthorityDao;
 import com.ece356.demographics.dao.UserDao;
+import com.ece356.demographics.model.Authority;
 import com.ece356.demographics.model.User;
 import com.ece356.demographics.SecurityConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -43,7 +44,10 @@ public class UserController {
     public List<User> list() {
         return jdbi.withExtension(UserDao.class, UserDao::getUsers);
     }
-
+    @RequestMapping(value = "/read/users/listRoles", method = GET)
+    public List<Authority> listRoles() {
+        return jdbi.withExtension(AuthorityDao.class, AuthorityDao::getUsers);
+    }
     @RequestMapping(value = "/create/users/createNormalUser", method = GET)
     public String createNormalUser(@RequestParam(value="username") String username,
                                  @RequestParam(value="password") String password,
@@ -52,7 +56,7 @@ public class UserController {
         String encodedPassword = SecurityConfig.passwordEncoder().encode(password);
         jdbi.useExtension(UserDao.class, dao -> dao.createNormalUser(username, encodedPassword, isEnabled));
         jdbi.useExtension(AuthorityDao.class, dao -> dao.createUserRole(username, "ROLE_USER"));
-        return "Done";
+        return "Normal user created";
     }
 
     @RequestMapping(value = "/create/users/createAdminUser", method = GET)
@@ -63,13 +67,13 @@ public class UserController {
         String encodedPassword = SecurityConfig.passwordEncoder().encode(password);
         jdbi.useExtension(UserDao.class, dao -> dao.createNormalUser(username, encodedPassword, isEnabled));
         jdbi.useExtension(AuthorityDao.class, dao -> dao.createUserRole(username, "ROLE_ADMIN"));
-        return "Done";
+        return "Admin user created";
     }
 
     @RequestMapping(value = "/update/users/enableUser", method = GET)
     public String enableUser(@RequestParam(value="username") String username) {
         jdbi.useExtension(UserDao.class, dao->dao.enableUser(username));
-        return "Enabled";
+        return "Enabled "+username;
     }
 
     @RequestMapping(value = "/update/users/disableUser", method = GET)
@@ -83,7 +87,27 @@ public class UserController {
                                 @RequestParam(value="password") String password) {
         String encodedPassword = SecurityConfig.passwordEncoder().encode(password);
         jdbi.useExtension(UserDao.class, dao->dao.updateUserPassword(username, encodedPassword));
-        return "Disabled";
+        return username + "\'s password reset";
+    }
+
+    @RequestMapping(value = "/update/users/setAdmin", method = GET)
+    public String setAdminUser(@RequestParam(value="username") String username) {
+        jdbi.useExtension(AuthorityDao.class, dao->dao.setUserToRole(username, "ROLE_ADMIN"));
+        return username+" set to admin";
+    }
+
+    @RequestMapping(value = "/update/users/setNormal", method = GET)
+    public String setNormalUser(@RequestParam(value="username") String username) {
+        jdbi.useExtension(AuthorityDao.class, dao->dao.setUserToRole(username, "ROLE_USER"));
+        return username+" set to normal user";
+    }
+
+    @RequestMapping(value = "/delete/users", method = GET)
+    public String deleteUser(@RequestParam(value="username") String username) {
+        jdbi.useExtension(AuthorityDao.class, dao->dao.deleteUser(username));
+        jdbi.useExtension(UserDao.class, dao->dao.deleteUser(username));
+
+        return username+" deleted";
     }
 }
 
