@@ -21,14 +21,18 @@ public interface AuthorityDao {
     void createUserRole(@Bind("username") String username, @Bind("role") String role);
 
     @SqlQuery("SELECT * FROM authorities")
-    @RegisterBeanMapper(User.class)
+    @RegisterBeanMapper(Authority.class)
     List<Authority> getUsers();
 
     @SqlQuery("SELECT * FROM authorities WHERE username = :username")
-    @RegisterBeanMapper(User.class)
+    @RegisterBeanMapper(Authority.class)
     Authority getAuthority(@Bind("username") String username);
 
-    @SqlUpdate("UPDATE authorities SET role = :role WHERE username = :username")
+    @SqlUpdate("UPDATE authorities SET authority = :role WHERE username = :username")
     void setUserToRole(@Bind("username") String username, @Bind("role") String role);
+
+    @SqlUpdate("DELETE FROM authorities WHERE username = :username")
+    @RegisterBeanMapper(Authority.class)
+    void deleteUser(@Bind("username") String username);
 }
 

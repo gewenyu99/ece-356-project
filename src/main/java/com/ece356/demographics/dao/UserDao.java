@@ -22,26 +22,32 @@ public interface UserDao {
     @SqlUpdate("INSERT INTO users(username,password,enabled) VALUES(:username,:password,:enabled);")
     void createAdminUser(@BindBean User user);
 
-    @SqlQuery("SELECT username, enabled FROM users WHERE enabled = 1")
+    @SqlQuery("SELECT * FROM users WHERE enabled = 1;")
     @RegisterBeanMapper(User.class)
     List<User> getUsers();
 
-    @SqlQuery("SELECT * FROM users WHERE username = :username")
+    @SqlQuery("SELECT * FROM users WHERE username = :username;")
     @RegisterBeanMapper(User.class)
     User getUser(@Bind("username") String username);
 
-    @SqlUpdate("UPDATE users SET enabled = 1 WHERE username = :username")
+    @Transaction
+    @SqlUpdate("UPDATE users SET enabled = 1 WHERE username = :username;")
     @RegisterBeanMapper(User.class)
     void enableUser(@Bind("username") String username);
 
-    @SqlUpdate("UPDATE users SET enabled = 0 WHERE username = :username")
+    @Transaction
+    @SqlUpdate("UPDATE users SET enabled = 0 WHERE username = :username;")
     @RegisterBeanMapper(User.class)
     void disableUser(@Bind("username") String username);
 
-    @SqlUpdate("UPDATE users SET password = :password WHERE username = :username")
+    @Transaction
+    @SqlUpdate("UPDATE users SET password = :password WHERE username = :username;")
     @RegisterBeanMapper(User.class)
     void updateUserPassword(@Bind("username") String username, @Bind("password") String password);
 
+    @SqlUpdate("DELETE FROM users WHERE username = :username")
+    @RegisterBeanMapper(User.class)
+    void deleteUser(@Bind("username") String username);
 
 }
 
