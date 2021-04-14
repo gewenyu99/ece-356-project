@@ -1,5 +1,6 @@
 package com.ece356.demographics.dao;
 
+import com.ece356.demographics.model.Authority;
 import com.ece356.demographics.model.QolData;
 import com.ece356.demographics.model.User;
 import org.jdbi.v3.sqlobject.config.RegisterBeanMapper;
@@ -12,24 +13,20 @@ import org.jdbi.v3.sqlobject.transaction.Transaction;
 import com.ece356.demographics.SecurityConfig;
 import java.util.List;
 
-@RegisterBeanMapper(UserDao.class)
-public interface UserDao {
+@RegisterBeanMapper(AuthorityDao.class)
+public interface AuthorityDao {
 
     @Transaction
-    @SqlUpdate("INSERT INTO users(username,password,enabled) VALUES(:username,:password,:isEnabled);")
-    void createNormalUser(@Bind("username") String username, @Bind("password") String password, @Bind("isEnabled") int isEnabled);
+    @SqlUpdate("INSERT INTO authorities(username, authority) VALUES (:username, :role);")
+    void createUserRole(@Bind("username") String username, @Bind("role") String role);
 
-    @Transaction
-    @SqlUpdate("INSERT INTO users(username,password,enabled) VALUES(:username,:password,:enabled);")
-    void createAdminUser(@BindBean User user);
-
-    @SqlQuery("SELECT * FROM users")
+    @SqlQuery("SELECT * FROM authorities")
     @RegisterBeanMapper(User.class)
-    List<User> getUsers();
+    List<Authority> getUsers();
 
-    @SqlQuery("SELECT * FROM users WHERE username = :username")
+    @SqlQuery("SELECT * FROM authorities WHERE username = :username")
     @RegisterBeanMapper(User.class)
-    User getUser(@Bind("username") String username);
+    Authority getAuthority(@Bind("username") String username);
 
 }
 

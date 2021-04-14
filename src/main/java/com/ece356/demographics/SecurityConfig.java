@@ -30,15 +30,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         auth.jdbcAuthentication()
-                .dataSource(dataSource)
-                .withUser(User.withUsername("root").password(passwordEncoder().encode("rtxon"))
-                        .roles("ADMIN"))
-                .withUser(User.withUsername("bob").password(passwordEncoder().encode("rtxoff"))
-                        .roles("USER"));
+                .dataSource(dataSource);
+//                .withUser(User.withUsername("root").password(passwordEncoder().encode("rtxon"))
+//                        .roles("ADMIN"))
+//                .withUser(User.withUsername("bob").password(passwordEncoder().encode("rtxoff"))
+//                        .roles("USER"));
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
+    public static PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 }
