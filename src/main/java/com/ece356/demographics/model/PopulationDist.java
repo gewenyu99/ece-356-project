@@ -1,13 +1,22 @@
 package com.ece356.demographics.model;
 
 
+import org.springframework.data.annotation.Id;
+
 public class PopulationDist {
 
+    @Id
     private String countryId;
     private long year;
     private long age;
     private long population;
 
+    public PopulationDist(String countryId, int year, long age, long population) {
+        this.countryId = countryId;
+        this.year = year;
+        this.age = age;
+        this.population = population;
+    }
 
     public String getCountryId() {
         return countryId;

@@ -132,21 +132,21 @@ drop table TempPopulationDataTwo;
 
 -- Please run python3 fix_population.py
 
-create table PopulationDist
+create table population_dist
 (
-    countryID  char(2),
+    country_id  char(2),
     year       int,
     age        int,
     population int,
-    foreign key (countryID) references country (country_id)
+    foreign key (country_id) references country (country_id)
 );
 
-load data infile '/mnt/population_results.csv' ignore into table PopulationDist
+load data infile '/mnt/population_results.csv' ignore into table population_dist
     fields terminated by ','
     enclosed by '"'
     lines terminated by '\n'
     ignore 0 lines
-    (countryID, year, age, population);
+    (country_id, year, age, population);
 
 --
 --
