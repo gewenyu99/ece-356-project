@@ -2,11 +2,13 @@ package com.ece356.demographics.service;
 
 import com.ece356.demographics.model.Country;
 import com.ece356.demographics.model.PopulationDist;
+import com.ece356.demographics.model.PopulationDist5YearRange;
 import com.ece356.demographics.repository.CountryRepository;
 import com.ece356.demographics.repository.PopulationDistRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -18,6 +20,10 @@ public class PopulationDistService {
     public PopulationDist getPopulationDist(String id, long year) {
         Optional<PopulationDist> populationDistResponse = populationDistRepository.findByCountryIdAndYear(id, year);
         return populationDistResponse.orElse(null);
+    }
+
+    public List<PopulationDist> getPopulationDistBetween(String id, long startYear, long endYear) {
+        return populationDistRepository.findByCountryIdAndYearBetween(id, startYear, endYear);
     }
 
     public PopulationDist addPopulationDist(PopulationDist populationDist) {

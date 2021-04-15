@@ -2,6 +2,7 @@ package com.ece356.demographics.controller;
 
 import com.ece356.demographics.DemographicsApplication;
 import com.ece356.demographics.dao.PopulationDist5YearRangeDao;
+import com.ece356.demographics.model.PopulationData;
 import com.ece356.demographics.model.PopulationDist;
 import com.ece356.demographics.model.PopulationDist5YearRange;
 import com.ece356.demographics.service.PopulationDist5YearRangeService;
@@ -32,13 +33,18 @@ public class PopulationDist5YearRangeController {
         this.populationDistService = populationDistService;
     }
 
-    @RequestMapping(value = "/populationDist5YearRange", method = GET)
+    @RequestMapping(value = "/data/populationDist5YearRange", method = GET)
     public List<PopulationDist5YearRange> PopulationDist5YearRange(@RequestParam(value="countryIDs", required=false) String[] idList,
                                                                    @RequestParam(value="page", required=false, defaultValue = "1") int page) {
         if(idList == null){
             return jdbi.withExtension(PopulationDist5YearRangeDao.class, dao -> dao.getPopulationDist5YearRange((page-1)* DemographicsApplication.PAGE_SIZE ));
         }
         return jdbi.withExtension(PopulationDist5YearRangeDao.class, dao -> dao.getPopulationDist5YearRange( Arrays.asList(idList), (page-1) * DemographicsApplication.PAGE_SIZE));
+    }
+
+    @RequestMapping(value = "/data/populationDist5YearRange/{id}/{startYear}/{endYear}")
+    public List<PopulationDist5YearRange> getPopulationDataBetween(@PathVariable String id, @PathVariable long startYear, @PathVariable long endYear) {
+        return populationDistService.getPopulationDist5YearRangeBetween(id, startYear, endYear);
     }
 
     @PostMapping(value = "/create/populationDist5YearRange")

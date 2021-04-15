@@ -6,6 +6,7 @@ import com.ece356.demographics.repository.QolDataRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -17,6 +18,10 @@ public class QolDataService {
     public QolData getQolData(String id, long year) {
         Optional<QolData> qolDataResponse = qolDataRepository.findByCountryIdAndYear(id, year);
         return qolDataResponse.orElse(null);
+    }
+
+    public List<QolData> getQolDataBetween(String id, long startYear, long endYear) {
+        return qolDataRepository.findByCountryIdAndYearBetween(id, startYear, endYear);
     }
 
     public QolData addQolData(QolData QolData) {

@@ -5,6 +5,7 @@ import com.ece356.demographics.repository.PopulationDataRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -16,6 +17,10 @@ public class PopulationDataService {
     public PopulationData getPopulationData(String id, long year) {
         Optional<PopulationData> populationDataResponse = populationDataRepository.findByCountryIdAndYear(id, year);
         return populationDataResponse.orElse(null);
+    }
+
+    public List<PopulationData> getPopulationDataBetween(String id, long startYear, long endYear) {
+        return populationDataRepository.findByCountryIdAndYearBetween(id, startYear, endYear);
     }
 
     public PopulationData addPopulationData(PopulationData populationData) {

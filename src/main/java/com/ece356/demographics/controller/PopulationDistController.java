@@ -7,6 +7,7 @@ import com.ece356.demographics.dao.PopulationDistDao;
 import com.ece356.demographics.model.Country;
 import com.ece356.demographics.model.PopulationData;
 import com.ece356.demographics.model.PopulationDist;
+import com.ece356.demographics.model.PopulationDist5YearRange;
 import com.ece356.demographics.service.CountryService;
 import com.ece356.demographics.service.PopulationDistService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,7 +37,7 @@ public class PopulationDistController {
         this.populationDistService = populationDistService;
     }
 
-    @RequestMapping(value = "/populationDist", method = GET)
+    @RequestMapping(value = "/data/populationDist", method = GET)
     public List<PopulationDist> populationDist(@RequestParam(value="countryIDs", required=false) String[] idList,
                                                @RequestParam(value="page", required=false, defaultValue = "1") int page) {
         if(idList == null){
@@ -44,6 +45,12 @@ public class PopulationDistController {
         }
         return jdbi.withExtension(PopulationDistDao.class, dao -> dao.getPopulationDist( Arrays.asList(idList), (page-1) * DemographicsApplication.PAGE_SIZE));
     }
+
+    @RequestMapping(value = "/data/populationDist/{id}/{startYear}/{endYear}")
+    public List<PopulationDist> getPopulationDistBetween(@PathVariable String id, @PathVariable long startYear, @PathVariable long endYear) {
+        return populationDistService.getPopulationDistBetween(id, startYear, endYear);
+    }
+
 
     @PostMapping(value = "/create/populationDist")
     public String create(@RequestBody PopulationDist populationDist) {

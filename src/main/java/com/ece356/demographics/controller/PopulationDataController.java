@@ -34,13 +34,18 @@ public class PopulationDataController {
         this.populationDataService = populationDataService;
     }
 
-    @RequestMapping(value = "/populationData", method = GET)
+    @RequestMapping(value = "/data/populationData", method = GET)
     public List<PopulationData> populationData(@RequestParam(value="countryIDs", required=false) String[] idList,
                                                @RequestParam(value="page", required=false, defaultValue = "1") int page) {
         if(idList == null){
             return jdbi.withExtension(PopulationDataDao.class, dao -> dao.getPopulationData((page-1)* DemographicsApplication.PAGE_SIZE ));
         }
         return jdbi.withExtension(PopulationDataDao.class, dao -> dao.getPopulationData( Arrays.asList(idList), (page-1) * DemographicsApplication.PAGE_SIZE));
+    }
+
+    @RequestMapping(value = "/data/populationData/{id}/{startYear}/{endYear}")
+    public List<PopulationData> getPopulationDataBetween(@PathVariable String id, @PathVariable long startYear, @PathVariable long endYear) {
+        return populationDataService.getPopulationDataBetween(id, startYear, endYear);
     }
 
     @PostMapping(value = "/create/populationData")
