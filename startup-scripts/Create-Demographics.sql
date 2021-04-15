@@ -7,7 +7,7 @@ drop table if exists PopulationData;
 drop table if exists population_dist;
 drop table if exists population_dist5_year_range;
 drop table if exists tempHDI;
-drop table if exists QolData;
+drop table if exists qol_data;
 drop table if exists country;
 
 --
@@ -183,29 +183,31 @@ load data infile '/mnt/midyear_population_5yr_age_sex.csv' ignore into table pop
 -- HDI is in Human-Development-Index.csv
 -- SurvivalToAge65 is in Economy Data.csv but it is split into female male
 
-create table QolData
+create table qol_data
 (
-    countryID       char(2),
+    country_id       char(2),
     year            int,
-    HDI             decimal(4, 3),
-    lifeExpectancy  decimal(11, 8),
-    survivalToAge65 decimal(10, 8),
-    foreign key (countryID) references country (country_id)
+    hdi             decimal(4, 3),
+    life_expectancy  decimal(11, 8),
+    survival_to_age65 decimal(10, 8),
+    primary key (country_id, year),
+    foreign key (country_id) references country (country_id)
 );
 
-load data infile '/mnt/economy_results.csv' ignore into table QolData
+load data infile '/mnt/economy_results.csv' ignore into table qol_data
     fields terminated by ','
     enclosed by '"'
     lines terminated by '\n'
     ignore 0 lines
-    (countryID, year, lifeExpectancy, survivalToAge65);
+    (country_id, year, life_expectancy, survival_to_age65);
 
 create table tempHDI
 (
-    countryID char(2),
+    country_id char(2),
     year      int,
-    HDI       decimal(4, 3),
-    foreign key (countryID) references country (country_id)
+    hdi       decimal(4, 3),
+    primary key (country_id, year),
+    foreign key (country_id) references country (country_id)
 );
 
 load data infile '/mnt/hdi_results.csv' ignore into table tempHDI
@@ -213,11 +215,11 @@ load data infile '/mnt/hdi_results.csv' ignore into table tempHDI
     enclosed by '"'
     lines terminated by '\n'
     ignore 0 lines
-    (countryID, year, HDI);
+    (country_id, year, hdi);
 
-update QolData
-    inner join tempHDI on QolData.countryID = tempHDI.countryID and QolData.year = tempHDI.year
-set QolData.HDI = tempHDI.HDI;
+update qol_data
+    inner join tempHDI on qol_data.country_id = tempHDI.country_id and qol_data.year = tempHDI.year
+set qol_data.hdi = tempHDI.hdi;
 
 drop table tempHDI;
 
