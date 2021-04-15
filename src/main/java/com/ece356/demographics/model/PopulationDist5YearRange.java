@@ -1,8 +1,11 @@
 package com.ece356.demographics.model;
 
 
+import org.springframework.data.annotation.Id;
+
 public class PopulationDist5YearRange {
 
+    @Id
     private String countryId;
     private long year;
     private long startAge;

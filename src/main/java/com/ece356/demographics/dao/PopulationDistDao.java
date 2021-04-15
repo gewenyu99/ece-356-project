@@ -12,7 +12,7 @@ import java.util.List;
 
 @RegisterBeanMapper(PopulationDist.class)
 public interface PopulationDistDao {
-    @SqlQuery("SELECT * FROM population_dist WHERE countryID in (<idList>) ORDER BY year,age LIMIT 30 OFFSET :pageOffset;")
+    @SqlQuery("SELECT * FROM population_dist WHERE country_id in (<idList>) ORDER BY year,age LIMIT 30 OFFSET :pageOffset;")
     List<PopulationDist> getPopulationDist(@BindList("idList") List<String> idList,
                                            @Bind("pageOffset") int pageOffset);
 

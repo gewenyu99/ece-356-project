@@ -4,8 +4,8 @@ drop table if exists authorities;
 drop table if exists users;
 
 drop table if exists PopulationData;
-drop table if exists PopulationDist;
-drop table if exists PopulationDist_5YearRange;
+drop table if exists population_dist;
+drop table if exists population_dist5_year_range;
 drop table if exists tempHDI;
 drop table if exists QolData;
 drop table if exists country;
@@ -138,6 +138,7 @@ create table population_dist
     year       int,
     age        int,
     population int,
+    primary key (country_id, year),
     foreign key (country_id) references country (country_id)
 );
 
@@ -154,21 +155,22 @@ load data infile '/mnt/population_results.csv' ignore into table population_dist
 --
 --
 
-create table PopulationDist_5YearRange
+create table population_dist5_year_range
 (
-    countryID  char(2),
+    country_id  char(2),
     year       int,
-    startAge   int,
+    start_age   int,
     population int,
-    foreign key (countryID) references country (country_id)
+    primary key (country_id, year),
+    foreign key (country_id) references country (country_id)
 );
 
-load data infile '/mnt/midyear_population_5yr_age_sex.csv' ignore into table PopulationDist_5YearRange
+load data infile '/mnt/midyear_population_5yr_age_sex.csv' ignore into table population_dist5_year_range
     fields terminated by ','
     enclosed by '"'
     lines terminated by '\n'
     ignore 0 lines
-    (countryID, @dummy, year, @dummy, startAge, @dummy, @dummy, population, @dummy, @dummy);
+    (country_id, @dummy, year, @dummy, start_age, @dummy, @dummy, population, @dummy, @dummy);
 
 --
 --
