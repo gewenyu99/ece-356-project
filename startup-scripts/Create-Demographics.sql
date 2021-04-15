@@ -3,7 +3,7 @@ drop table if exists ix_auth_username;
 drop table if exists authorities;
 drop table if exists users;
 
-drop table if exists PopulationData;
+drop table if exists population_data;
 drop table if exists population_dist;
 drop table if exists population_dist5_year_range;
 drop table if exists tempHDI;
@@ -59,31 +59,33 @@ load data infile '/mnt/country_names_area.csv' ignore into table country
 -- 
 --
 
-create table PopulationData
+create table population_data
 (
-    countryID           char(2),
+    country_id           char(2),
     year                int,
-    birthRate           decimal(5, 2),
-    deathRate           decimal(5, 2),
-    infantMortalityRate decimal(5, 2),
-    totalPopulation     int,
-    foreign key (countryID) references country (country_id)
+    birth_rate           decimal(5, 2),
+    death_rate           decimal(5, 2),
+    infant_mortality_rate decimal(5, 2),
+    total_population     int,
+    primary key (country_id, year),
+    foreign key (country_id) references country (country_id)
 );
 
-load data infile '/mnt/birth_death_growth_rates.csv' ignore into table PopulationData
+load data infile '/mnt/birth_death_growth_rates.csv' ignore into table population_data
     fields terminated by ','
     enclosed by '"'
     lines terminated by '\n'
     ignore 1 lines
-    (countryID, @dummy, year, birthRate, deathRate, @dummy, @dummy, @dummy);
+    (country_id, @dummy, year, birth_rate, death_rate, @dummy, @dummy, @dummy);
 
 -- We still need infantMortalityRate and totalPopulation
 create table TempPopulationDataOne
 (
-    countryID  char(2),
+    country_id  char(2),
     year       int,
     population int,
-    foreign key (countryID) references country (country_id)
+    primary key (country_id, year),
+    foreign key (country_id) references country (country_id)
 );
 
 load data infile '/mnt/midyear_population.csv' ignore into table TempPopulationDataOne
@@ -91,20 +93,21 @@ load data infile '/mnt/midyear_population.csv' ignore into table TempPopulationD
     enclosed by '"'
     lines terminated by '\n'
     ignore 1 lines
-    (countryID, @dummy, year, population);
+    (country_id, @dummy, year, population);
 
-update PopulationData
+update population_data
     inner join TempPopulationDataOne on
-            PopulationData.countryID = TempPopulationDataOne.countryID
-            and PopulationData.year = TempPopulationDataOne.year
-set PopulationData.totalPopulation = TempPopulationDataOne.population;
+            population_data.country_id = TempPopulationDataOne.country_id
+            and population_data.year = TempPopulationDataOne.year
+set population_data.total_population = TempPopulationDataOne.population;
 
 create table TempPopulationDataTwo
 (
-    countryID           char(2),
+    country_id           char(2),
     year                int,
-    infantMortalityRate int,
-    foreign key (countryID) references country (country_id)
+    infant_mortality_rate int,
+    primary key (country_id, year),
+    foreign key (country_id) references country (country_id)
 );
 
 load data infile '/mnt/mortality_life_expectancy.csv' ignore into table TempPopulationDataTwo
@@ -112,14 +115,14 @@ load data infile '/mnt/mortality_life_expectancy.csv' ignore into table TempPopu
     enclosed by '"'
     lines terminated by '\n'
     ignore 1 lines
-    (countryID, @dummy, year, infantMortalityRate, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy,
+    (country_id, @dummy, year, infant_mortality_rate, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy,
      @dummy, @dummy, @dummy);
 
-update PopulationData
+update population_data
     inner join TempPopulationDataTwo on
-            PopulationData.countryID = TempPopulationDataTwo.countryID
-            and PopulationData.year = TempPopulationDataTwo.year
-set PopulationData.infantMortalityRate = TempPopulationDataTwo.infantMortalityRate;
+            population_data.country_id = TempPopulationDataTwo.country_id
+            and population_data.year = TempPopulationDataTwo.year
+set population_data.infant_mortality_rate = TempPopulationDataTwo.infant_mortality_rate;
 
 drop table TempPopulationDataOne;
 drop table TempPopulationDataTwo;

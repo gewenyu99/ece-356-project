@@ -62,7 +62,7 @@ public class QolDataController {
     @RequestMapping("/delete/qolData/{id}/{year}")
     public String delete(@PathVariable String id, @PathVariable long year) {
         qolDataService.deleteQolData(id, year);
-        return "maybe delete populatioin dist";
+        return "maybe delete qol data";
     }
 }
 
