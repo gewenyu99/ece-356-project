@@ -11,9 +11,9 @@ drop table if exists qol_data;
 drop table if exists country;
 
 --
--- 
--- :) 
--- 
+--
+-- :)
+--
 --
 
 CREATE TABLE users (
@@ -32,10 +32,10 @@ CREATE TABLE authorities (
 CREATE UNIQUE INDEX ix_auth_username
     on authorities (username,authority);
 
--- 
--- 
--- :) 
--- 
+--
+--
+-- :)
+--
 --
 
 create table country
@@ -50,13 +50,13 @@ load data infile '/mnt/country_names_area.csv' ignore into table country
     enclosed by '"'
     lines terminated by '\n'
     ignore 1 lines
-    (country_id, countryName, @dummy);
+    (country_id, country_name, @dummy);
 
 
--- 
--- 
--- :) 
--- 
+--
+--
+-- :)
+--
 --
 
 create table population_data
@@ -97,7 +97,7 @@ load data infile '/mnt/midyear_population.csv' ignore into table TempPopulationD
 
 update population_data
     inner join TempPopulationDataOne on
-            population_data.country_id = TempPopulationDataOne.country_id
+                population_data.country_id = TempPopulationDataOne.country_id
             and population_data.year = TempPopulationDataOne.year
 set population_data.total_population = TempPopulationDataOne.population;
 
@@ -120,7 +120,7 @@ load data infile '/mnt/mortality_life_expectancy.csv' ignore into table TempPopu
 
 update population_data
     inner join TempPopulationDataTwo on
-            population_data.country_id = TempPopulationDataTwo.country_id
+                population_data.country_id = TempPopulationDataTwo.country_id
             and population_data.year = TempPopulationDataTwo.year
 set population_data.infant_mortality_rate = TempPopulationDataTwo.infant_mortality_rate;
 
@@ -192,10 +192,15 @@ create table qol_data
     year            int,
     hdi             decimal(4, 3),
     life_expectancy  decimal(11, 8),
+    CONSTRAINT lifeExpectancy_Ck CHECK (life_expectancy > 0),
     survival_to_age65 decimal(10, 8),
+    CONSTRAINT survivalToAge65_Ck CHECK (survival_to_age65 > 0),
     primary key (country_id, year),
     foreign key (country_id) references country (country_id)
 );
+alter table qol_data modify hdi decimal(4,3) not null;
+alter table qol_data modify life_expectancy decimal(11, 8) not null;
+alter table qol_data modify survival_to_age65 decimal(10, 8) not null;
 
 load data infile '/mnt/economy_results.csv' ignore into table qol_data
     fields terminated by ','
@@ -209,6 +214,7 @@ create table tempHDI
     country_id char(2),
     year      int,
     hdi       decimal(4, 3),
+    CONSTRAINT temp_hdi_Ck CHECK (hdi > 0),
     primary key (country_id, year),
     foreign key (country_id) references country (country_id)
 );
@@ -225,7 +231,6 @@ update qol_data
 set qol_data.hdi = tempHDI.hdi;
 
 drop table tempHDI;
-
 
 
 
