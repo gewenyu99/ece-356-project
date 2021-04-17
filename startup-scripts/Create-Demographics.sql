@@ -3,11 +3,11 @@ drop table if exists ix_auth_username;
 drop table if exists authorities;
 drop table if exists users;
 
-drop table if exists population_data;
-drop table if exists population_dist;
-drop table if exists population_dist5_year_range;
+drop table if exists PopulationData;
+drop table if exists PopulationDist;
+drop table if exists PopulationDist_5YearRange;
 drop table if exists tempHDI;
-drop table if exists qol_data;
+drop table if exists QolData;
 drop table if exists country;
 
 --
@@ -41,7 +41,7 @@ CREATE UNIQUE INDEX ix_auth_username
 create table country
 (
     country_id   char(2),
-    country_name char(50),
+    countryName char(50),
     primary key (country_id)
 );
 
@@ -59,33 +59,31 @@ load data infile '/mnt/country_names_area.csv' ignore into table country
 -- 
 --
 
-create table population_data
+create table PopulationData
 (
-    country_id           char(2),
+    countryID           char(2),
     year                int,
-    birth_rate           decimal(5, 2),
-    death_rate           decimal(5, 2),
-    infant_mortality_rate decimal(5, 2),
-    total_population     int,
-    primary key (country_id, year),
-    foreign key (country_id) references country (country_id)
+    birthRate           decimal(5, 2),
+    deathRate           decimal(5, 2),
+    infantMortalityRate decimal(5, 2),
+    totalPopulation     int,
+    foreign key (countryID) references country (country_id)
 );
 
-load data infile '/mnt/birth_death_growth_rates.csv' ignore into table population_data
+load data infile '/mnt/birth_death_growth_rates.csv' ignore into table PopulationData
     fields terminated by ','
     enclosed by '"'
     lines terminated by '\n'
     ignore 1 lines
-    (country_id, @dummy, year, birth_rate, death_rate, @dummy, @dummy, @dummy);
+    (countryID, @dummy, year, birthRate, deathRate, @dummy, @dummy, @dummy);
 
 -- We still need infantMortalityRate and totalPopulation
 create table TempPopulationDataOne
 (
-    country_id  char(2),
+    countryID  char(2),
     year       int,
     population int,
-    primary key (country_id, year),
-    foreign key (country_id) references country (country_id)
+    foreign key (countryID) references country (country_id)
 );
 
 load data infile '/mnt/midyear_population.csv' ignore into table TempPopulationDataOne
@@ -93,21 +91,20 @@ load data infile '/mnt/midyear_population.csv' ignore into table TempPopulationD
     enclosed by '"'
     lines terminated by '\n'
     ignore 1 lines
-    (country_id, @dummy, year, population);
+    (countryID, @dummy, year, population);
 
-update population_data
+update PopulationData
     inner join TempPopulationDataOne on
-            population_data.country_id = TempPopulationDataOne.country_id
-            and population_data.year = TempPopulationDataOne.year
-set population_data.total_population = TempPopulationDataOne.population;
+            PopulationData.countryID = TempPopulationDataOne.countryID
+            and PopulationData.year = TempPopulationDataOne.year
+set PopulationData.totalPopulation = TempPopulationDataOne.population;
 
 create table TempPopulationDataTwo
 (
-    country_id           char(2),
+    countryID           char(2),
     year                int,
-    infant_mortality_rate int,
-    primary key (country_id, year),
-    foreign key (country_id) references country (country_id)
+    infantMortalityRate int,
+    foreign key (countryID) references country (country_id)
 );
 
 load data infile '/mnt/mortality_life_expectancy.csv' ignore into table TempPopulationDataTwo
@@ -115,14 +112,14 @@ load data infile '/mnt/mortality_life_expectancy.csv' ignore into table TempPopu
     enclosed by '"'
     lines terminated by '\n'
     ignore 1 lines
-    (country_id, @dummy, year, infant_mortality_rate, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy,
+    (countryID, @dummy, year, infantMortalityRate, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy,
      @dummy, @dummy, @dummy);
 
-update population_data
+update PopulationData
     inner join TempPopulationDataTwo on
-            population_data.country_id = TempPopulationDataTwo.country_id
-            and population_data.year = TempPopulationDataTwo.year
-set population_data.infant_mortality_rate = TempPopulationDataTwo.infant_mortality_rate;
+            PopulationData.countryID = TempPopulationDataTwo.countryID
+            and PopulationData.year = TempPopulationDataTwo.year
+set PopulationData.infantMortalityRate = TempPopulationDataTwo.infantMortalityRate;
 
 drop table TempPopulationDataOne;
 drop table TempPopulationDataTwo;
@@ -135,22 +132,21 @@ drop table TempPopulationDataTwo;
 
 -- Please run python3 fix_population.py
 
-create table population_dist
+create table PopulationDist
 (
-    country_id  char(2),
+    countryID  char(2),
     year       int,
     age        int,
     population int,
-    primary key (country_id, year),
-    foreign key (country_id) references country (country_id)
+    foreign key (countryID) references country (country_id)
 );
 
-load data infile '/mnt/population_results.csv' ignore into table population_dist
+load data infile '/mnt/population_results.csv' ignore into table PopulationDist
     fields terminated by ','
     enclosed by '"'
     lines terminated by '\n'
     ignore 0 lines
-    (country_id, year, age, population);
+    (countryID, year, age, population);
 
 --
 --
@@ -158,22 +154,21 @@ load data infile '/mnt/population_results.csv' ignore into table population_dist
 --
 --
 
-create table population_dist5_year_range
+create table PopulationDist_5YearRange
 (
-    country_id  char(2),
+    countryID  char(2),
     year       int,
-    start_age   int,
+    startAge   int,
     population int,
-    primary key (country_id, year),
-    foreign key (country_id) references country (country_id)
+    foreign key (countryID) references country (country_id)
 );
 
-load data infile '/mnt/midyear_population_5yr_age_sex.csv' ignore into table population_dist5_year_range
+load data infile '/mnt/midyear_population_5yr_age_sex.csv' ignore into table PopulationDist_5YearRange
     fields terminated by ','
     enclosed by '"'
     lines terminated by '\n'
     ignore 0 lines
-    (country_id, @dummy, year, @dummy, start_age, @dummy, @dummy, population, @dummy, @dummy);
+    (countryID, @dummy, year, @dummy, startAge, @dummy, @dummy, population, @dummy, @dummy);
 
 --
 --
@@ -186,31 +181,29 @@ load data infile '/mnt/midyear_population_5yr_age_sex.csv' ignore into table pop
 -- HDI is in Human-Development-Index.csv
 -- SurvivalToAge65 is in Economy Data.csv but it is split into female male
 
-create table qol_data
+create table QolData
 (
-    country_id       char(2),
+    countryID       char(2),
     year            int,
-    hdi             decimal(4, 3),
-    life_expectancy  decimal(11, 8),
-    survival_to_age65 decimal(10, 8),
-    primary key (country_id, year),
-    foreign key (country_id) references country (country_id)
+    HDI             decimal(4, 3),
+    lifeExpectancy  decimal(11, 8),
+    survivalToAge65 decimal(10, 8),
+    foreign key (countryID) references country (country_id)
 );
 
-load data infile '/mnt/economy_results.csv' ignore into table qol_data
+load data infile '/mnt/economy_results.csv' ignore into table QolData
     fields terminated by ','
     enclosed by '"'
     lines terminated by '\n'
     ignore 0 lines
-    (country_id, year, life_expectancy, survival_to_age65);
+    (countryID, year, lifeExpectancy, survivalToAge65);
 
 create table tempHDI
 (
-    country_id char(2),
+    countryID char(2),
     year      int,
-    hdi       decimal(4, 3),
-    primary key (country_id, year),
-    foreign key (country_id) references country (country_id)
+    HDI       decimal(4, 3),
+    foreign key (countryID) references country (country_id)
 );
 
 load data infile '/mnt/hdi_results.csv' ignore into table tempHDI
@@ -218,11 +211,11 @@ load data infile '/mnt/hdi_results.csv' ignore into table tempHDI
     enclosed by '"'
     lines terminated by '\n'
     ignore 0 lines
-    (country_id, year, hdi);
+    (countryID, year, HDI);
 
-update qol_data
-    inner join tempHDI on qol_data.country_id = tempHDI.country_id and qol_data.year = tempHDI.year
-set qol_data.hdi = tempHDI.hdi;
+update QolData
+    inner join tempHDI on QolData.countryID = tempHDI.countryID and QolData.year = tempHDI.year
+set QolData.HDI = tempHDI.HDI;
 
 drop table tempHDI;
 
