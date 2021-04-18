@@ -3,17 +3,16 @@ drop table if exists ix_auth_username;
 drop table if exists authorities;
 drop table if exists users;
 
-drop table if exists PopulationData;
-drop table if exists PopulationDist;
-drop table if exists PopulationDist_5YearRange;
+drop table if exists population_data;
+drop table if exists population_dist;
 drop table if exists tempHDI;
-drop table if exists QolData;
+drop table if exists qol_data;
 drop table if exists country;
 
 --
--- 
--- :) 
--- 
+--
+-- :)
+--
 --
 
 CREATE TABLE users (
@@ -32,16 +31,16 @@ CREATE TABLE authorities (
 CREATE UNIQUE INDEX ix_auth_username
     on authorities (username,authority);
 
--- 
--- 
--- :) 
--- 
+--
+--
+-- :)
+--
 --
 
 create table country
 (
     country_id   char(2),
-    countryName char(50),
+    country_name char(50),
     primary key (country_id)
 );
 
@@ -50,40 +49,42 @@ load data infile '/mnt/country_names_area.csv' ignore into table country
     enclosed by '"'
     lines terminated by '\n'
     ignore 1 lines
-    (country_id, countryName, @dummy);
+    (country_id, country_name, @dummy);
 
 
--- 
--- 
--- :) 
--- 
+--
+--
+-- :)
+--
 --
 
-create table PopulationData
+create table population_data
 (
-    countryID           char(2),
+    country_id           char(2),
     year                int,
-    birthRate           decimal(5, 2),
-    deathRate           decimal(5, 2),
-    infantMortalityRate decimal(5, 2),
-    totalPopulation     int,
-    foreign key (countryID) references country (country_id)
+    birth_rate           decimal(5, 2),
+    death_rate           decimal(5, 2),
+    infant_mortality_rate decimal(5, 2),
+    total_population     int,
+    primary key (country_id, year),
+    foreign key (country_id) references country (country_id)
 );
 
-load data infile '/mnt/birth_death_growth_rates.csv' ignore into table PopulationData
+load data infile '/mnt/birth_death_growth_rates.csv' ignore into table population_data
     fields terminated by ','
     enclosed by '"'
     lines terminated by '\n'
     ignore 1 lines
-    (countryID, @dummy, year, birthRate, deathRate, @dummy, @dummy, @dummy);
+    (country_id, @dummy, year, birth_rate, death_rate, @dummy, @dummy, @dummy);
 
 -- We still need infantMortalityRate and totalPopulation
 create table TempPopulationDataOne
 (
-    countryID  char(2),
+    country_id  char(2),
     year       int,
     population int,
-    foreign key (countryID) references country (country_id)
+    primary key (country_id, year),
+    foreign key (country_id) references country (country_id)
 );
 
 load data infile '/mnt/midyear_population.csv' ignore into table TempPopulationDataOne
@@ -91,20 +92,21 @@ load data infile '/mnt/midyear_population.csv' ignore into table TempPopulationD
     enclosed by '"'
     lines terminated by '\n'
     ignore 1 lines
-    (countryID, @dummy, year, population);
+    (country_id, @dummy, year, population);
 
-update PopulationData
+update population_data
     inner join TempPopulationDataOne on
-            PopulationData.countryID = TempPopulationDataOne.countryID
-            and PopulationData.year = TempPopulationDataOne.year
-set PopulationData.totalPopulation = TempPopulationDataOne.population;
+                population_data.country_id = TempPopulationDataOne.country_id
+            and population_data.year = TempPopulationDataOne.year
+set population_data.total_population = TempPopulationDataOne.population;
 
 create table TempPopulationDataTwo
 (
-    countryID           char(2),
+    country_id           char(2),
     year                int,
-    infantMortalityRate int,
-    foreign key (countryID) references country (country_id)
+    infant_mortality_rate int,
+    primary key (country_id, year),
+    foreign key (country_id) references country (country_id)
 );
 
 load data infile '/mnt/mortality_life_expectancy.csv' ignore into table TempPopulationDataTwo
@@ -112,14 +114,14 @@ load data infile '/mnt/mortality_life_expectancy.csv' ignore into table TempPopu
     enclosed by '"'
     lines terminated by '\n'
     ignore 1 lines
-    (countryID, @dummy, year, infantMortalityRate, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy,
+    (country_id, @dummy, year, infant_mortality_rate, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy,
      @dummy, @dummy, @dummy);
 
-update PopulationData
+update population_data
     inner join TempPopulationDataTwo on
-            PopulationData.countryID = TempPopulationDataTwo.countryID
-            and PopulationData.year = TempPopulationDataTwo.year
-set PopulationData.infantMortalityRate = TempPopulationDataTwo.infantMortalityRate;
+                population_data.country_id = TempPopulationDataTwo.country_id
+            and population_data.year = TempPopulationDataTwo.year
+set population_data.infant_mortality_rate = TempPopulationDataTwo.infant_mortality_rate;
 
 drop table TempPopulationDataOne;
 drop table TempPopulationDataTwo;
@@ -132,44 +134,163 @@ drop table TempPopulationDataTwo;
 
 -- Please run python3 fix_population.py
 
-create table PopulationDist
+create table population_dist
 (
-    countryID  char(2),
+    country_id  char(2),
     year       int,
-    age        int,
-    population int,
-    foreign key (countryID) references country (country_id)
+    start_0    int default 0,
+    start_5    int default 0,
+    start_10   int default 0,
+    start_15   int default 0,
+    start_20   int default 0,
+    start_25   int default 0,
+    start_30   int default 0,
+    start_35   int default 0,
+    start_40   int default 0,
+    start_45   int default 0,
+    start_50   int default 0,
+    start_55   int default 0,
+    start_60   int default 0,
+    start_65   int default 0,
+    start_70   int default 0,
+    start_75   int default 0,
+    start_80   int default 0,
+    start_85   int default 0,
+    start_90   int default 0,
+    start_95   int default 0,
+    start_100  int default 0,
+    primary key (country_id, year),
+    foreign key (country_id) references country (country_id)
 );
 
-load data infile '/mnt/population_results.csv' ignore into table PopulationDist
+create table population_dist5_year_temp
+(
+    country_id  char(2),
+    year       int,
+    start_age   int,
+    end_age    int,
+    population int,
+    foreign key (country_id) references country (country_id),
+	check (start_age != 0 or end_age != 0)
+);
+
+load data infile '/mnt/midyear_population_5yr_age_sex.csv' ignore into table population_dist5_year_temp
     fields terminated by ','
     enclosed by '"'
     lines terminated by '\n'
     ignore 0 lines
-    (countryID, year, age, population);
+    (country_id, @dummy, year, @dummy, start_age, @dummy, @dummy, population, @dummy, @dummy);
+	
+INSERT INTO population_dist (country_id, year)
+SELECT distinct country_id, year
+    FROM population_dist5_year_temp;
 
---
---
--- :)
---
---
+UPDATE population_dist p
+    INNER JOIN population_dist5_year_temp pd5yr on p.country_id = pd5yr.country_id and p.year = pd5yr.year
+SET p.start_0 = pd5yr.population
+WHERE  pd5yr.start_age = 0;
 
-create table PopulationDist_5YearRange
-(
-    countryID  char(2),
-    year       int,
-    startAge   int,
-    population int,
-    foreign key (countryID) references country (country_id)
-);
+UPDATE population_dist p
+    INNER JOIN population_dist5_year_temp pd5yr on p.country_id = pd5yr.country_id and p.year = pd5yr.year
+SET p.start_5 = pd5yr.population
+WHERE  pd5yr.start_age = 5;
 
-load data infile '/mnt/midyear_population_5yr_age_sex.csv' ignore into table PopulationDist_5YearRange
-    fields terminated by ','
-    enclosed by '"'
-    lines terminated by '\n'
-    ignore 0 lines
-    (countryID, @dummy, year, @dummy, startAge, @dummy, @dummy, population, @dummy, @dummy);
+UPDATE population_dist p
+    INNER JOIN population_dist5_year_temp pd5yr on p.country_id = pd5yr.country_id and p.year = pd5yr.year
+SET p.start_10 = pd5yr.population
+WHERE  pd5yr.start_age = 10;
 
+UPDATE population_dist p
+    INNER JOIN population_dist5_year_temp pd5yr on p.country_id = pd5yr.country_id and p.year = pd5yr.year
+SET p.start_15 = pd5yr.population
+WHERE  pd5yr.start_age = 15;
+
+UPDATE population_dist p
+    INNER JOIN population_dist5_year_temp pd5yr on p.country_id = pd5yr.country_id and p.year = pd5yr.year
+SET p.start_20 = pd5yr.population
+WHERE  pd5yr.start_age = 20;
+
+UPDATE population_dist p
+    INNER JOIN population_dist5_year_temp pd5yr on p.country_id = pd5yr.country_id and p.year = pd5yr.year
+SET p.start_25 = pd5yr.population
+WHERE  pd5yr.start_age = 25;
+
+UPDATE population_dist p
+    INNER JOIN population_dist5_year_temp pd5yr on p.country_id = pd5yr.country_id and p.year = pd5yr.year
+SET p.start_30 = pd5yr.population
+WHERE  pd5yr.start_age = 30;
+
+UPDATE population_dist p
+    INNER JOIN population_dist5_year_temp pd5yr on p.country_id = pd5yr.country_id and p.year = pd5yr.year
+SET p.start_35 = pd5yr.population
+WHERE  pd5yr.start_age = 35;
+
+UPDATE population_dist p
+    INNER JOIN population_dist5_year_temp pd5yr on p.country_id = pd5yr.country_id and p.year = pd5yr.year
+SET p.start_40 = pd5yr.population
+WHERE  pd5yr.start_age = 40;
+
+UPDATE population_dist p
+    INNER JOIN population_dist5_year_temp pd5yr on p.country_id = pd5yr.country_id and p.year = pd5yr.year
+SET p.start_45 = pd5yr.population
+WHERE  pd5yr.start_age = 45;
+
+UPDATE population_dist p
+    INNER JOIN population_dist5_year_temp pd5yr on p.country_id = pd5yr.country_id and p.year = pd5yr.year
+SET p.start_50 = pd5yr.population
+WHERE  pd5yr.start_age = 50;
+
+UPDATE population_dist p
+    INNER JOIN population_dist5_year_temp pd5yr on p.country_id = pd5yr.country_id and p.year = pd5yr.year
+SET p.start_55 = pd5yr.population
+WHERE  pd5yr.start_age = 55;
+
+UPDATE population_dist p
+    INNER JOIN population_dist5_year_temp pd5yr on p.country_id = pd5yr.country_id and p.year = pd5yr.year
+SET p.start_60 = pd5yr.population
+WHERE  pd5yr.start_age = 60;
+
+UPDATE population_dist p
+    INNER JOIN population_dist5_year_temp pd5yr on p.country_id = pd5yr.country_id and p.year = pd5yr.year
+SET p.start_65 = pd5yr.population
+WHERE  pd5yr.start_age = 65;
+
+UPDATE population_dist p
+    INNER JOIN population_dist5_year_temp pd5yr on p.country_id = pd5yr.country_id and p.year = pd5yr.year
+SET p.start_70 = pd5yr.population
+WHERE  pd5yr.start_age = 70;
+
+UPDATE population_dist p
+    INNER JOIN population_dist5_year_temp pd5yr on p.country_id = pd5yr.country_id and p.year = pd5yr.year
+SET p.start_75 = pd5yr.population
+WHERE  pd5yr.start_age = 75;
+
+UPDATE population_dist p
+    INNER JOIN population_dist5_year_temp pd5yr on p.country_id = pd5yr.country_id and p.year = pd5yr.year
+SET p.start_80 = pd5yr.population
+WHERE  pd5yr.start_age = 80;
+
+UPDATE population_dist p
+    INNER JOIN population_dist5_year_temp pd5yr on p.country_id = pd5yr.country_id and p.year = pd5yr.year
+SET p.start_85 = pd5yr.population
+WHERE  pd5yr.start_age = 85;
+
+UPDATE population_dist p
+    INNER JOIN population_dist5_year_temp pd5yr on p.country_id = pd5yr.country_id and p.year = pd5yr.year
+SET p.start_90 = pd5yr.population
+WHERE  pd5yr.start_age = 90;
+
+UPDATE population_dist p
+    INNER JOIN population_dist5_year_temp pd5yr on p.country_id = pd5yr.country_id and p.year = pd5yr.year
+SET p.start_95 = pd5yr.population
+WHERE  pd5yr.start_age = 95;
+
+UPDATE population_dist p
+    INNER JOIN population_dist5_year_temp pd5yr on p.country_id = pd5yr.country_id and p.year = pd5yr.year
+SET p.start_100 = pd5yr.population
+WHERE  pd5yr.start_age = 100;
+
+drop table population_dist5_year_temp;
 --
 --
 -- :)
@@ -181,29 +302,37 @@ load data infile '/mnt/midyear_population_5yr_age_sex.csv' ignore into table Pop
 -- HDI is in Human-Development-Index.csv
 -- SurvivalToAge65 is in Economy Data.csv but it is split into female male
 
-create table QolData
+create table qol_data
 (
-    countryID       char(2),
+    country_id       char(2),
     year            int,
-    HDI             decimal(4, 3),
-    lifeExpectancy  decimal(11, 8),
-    survivalToAge65 decimal(10, 8),
-    foreign key (countryID) references country (country_id)
+    hdi             decimal(4, 3),
+    life_expectancy  decimal(11, 8),
+    CONSTRAINT lifeExpectancy_Ck CHECK (life_expectancy > 0),
+    survival_to_age65 decimal(10, 8),
+    CONSTRAINT survivalToAge65_Ck CHECK (survival_to_age65 > 0),
+    primary key (country_id, year),
+    foreign key (country_id) references country (country_id)
 );
+alter table qol_data modify hdi decimal(4,3) not null;
+alter table qol_data modify life_expectancy decimal(11, 8) not null;
+alter table qol_data modify survival_to_age65 decimal(10, 8) not null;
 
-load data infile '/mnt/economy_results.csv' ignore into table QolData
+load data infile '/mnt/economy_results.csv' ignore into table qol_data
     fields terminated by ','
     enclosed by '"'
     lines terminated by '\n'
     ignore 0 lines
-    (countryID, year, lifeExpectancy, survivalToAge65);
+    (country_id, year, life_expectancy, survival_to_age65);
 
 create table tempHDI
 (
-    countryID char(2),
+    country_id char(2),
     year      int,
-    HDI       decimal(4, 3),
-    foreign key (countryID) references country (country_id)
+    hdi       decimal(4, 3),
+    CONSTRAINT temp_hdi_Ck CHECK (hdi > 0),
+    primary key (country_id, year),
+    foreign key (country_id) references country (country_id)
 );
 
 load data infile '/mnt/hdi_results.csv' ignore into table tempHDI
@@ -211,14 +340,13 @@ load data infile '/mnt/hdi_results.csv' ignore into table tempHDI
     enclosed by '"'
     lines terminated by '\n'
     ignore 0 lines
-    (countryID, year, HDI);
+    (country_id, year, hdi);
 
-update QolData
-    inner join tempHDI on QolData.countryID = tempHDI.countryID and QolData.year = tempHDI.year
-set QolData.HDI = tempHDI.HDI;
+update qol_data
+    inner join tempHDI on qol_data.country_id = tempHDI.country_id and qol_data.year = tempHDI.year
+set qol_data.hdi = tempHDI.hdi;
 
 drop table tempHDI;
-
 
 
 
