@@ -5,7 +5,6 @@ drop table if exists users;
 
 drop table if exists population_data;
 drop table if exists population_dist;
-drop table if exists population_dist5_year_range;
 drop table if exists tempHDI;
 drop table if exists qol_data;
 drop table if exists country;
@@ -139,42 +138,159 @@ create table population_dist
 (
     country_id  char(2),
     year       int,
-    age        int,
-    population int,
+    start_0    int default 0,
+    start_5    int default 0,
+    start_10   int default 0,
+    start_15   int default 0,
+    start_20   int default 0,
+    start_25   int default 0,
+    start_30   int default 0,
+    start_35   int default 0,
+    start_40   int default 0,
+    start_45   int default 0,
+    start_50   int default 0,
+    start_55   int default 0,
+    start_60   int default 0,
+    start_65   int default 0,
+    start_70   int default 0,
+    start_75   int default 0,
+    start_80   int default 0,
+    start_85   int default 0,
+    start_90   int default 0,
+    start_95   int default 0,
+    start_100  int default 0,
     primary key (country_id, year),
     foreign key (country_id) references country (country_id)
 );
 
-load data infile '/mnt/population_results.csv' ignore into table population_dist
-    fields terminated by ','
-    enclosed by '"'
-    lines terminated by '\n'
-    ignore 0 lines
-    (country_id, year, age, population);
-
---
---
--- :)
---
---
-
-create table population_dist5_year_range
+create table population_dist5_year_temp
 (
     country_id  char(2),
     year       int,
     start_age   int,
+    end_age    int,
     population int,
-    primary key (country_id, year),
-    foreign key (country_id) references country (country_id)
+    foreign key (country_id) references country (country_id),
+	check (start_age != 0 or end_age != 0)
 );
 
-load data infile '/mnt/midyear_population_5yr_age_sex.csv' ignore into table population_dist5_year_range
+load data infile '/mnt/midyear_population_5yr_age_sex.csv' ignore into table population_dist5_year_temp
     fields terminated by ','
     enclosed by '"'
     lines terminated by '\n'
     ignore 0 lines
     (country_id, @dummy, year, @dummy, start_age, @dummy, @dummy, population, @dummy, @dummy);
+	
+INSERT INTO population_dist (country_id, year)
+SELECT distinct country_id, year
+    FROM population_dist5_year_temp;
 
+UPDATE population_dist p
+    INNER JOIN population_dist5_year_temp pd5yr on p.country_id = pd5yr.country_id and p.year = pd5yr.year
+SET p.start_0 = pd5yr.population
+WHERE  pd5yr.start_age = 0;
+
+UPDATE population_dist p
+    INNER JOIN population_dist5_year_temp pd5yr on p.country_id = pd5yr.country_id and p.year = pd5yr.year
+SET p.start_5 = pd5yr.population
+WHERE  pd5yr.start_age = 5;
+
+UPDATE population_dist p
+    INNER JOIN population_dist5_year_temp pd5yr on p.country_id = pd5yr.country_id and p.year = pd5yr.year
+SET p.start_10 = pd5yr.population
+WHERE  pd5yr.start_age = 10;
+
+UPDATE population_dist p
+    INNER JOIN population_dist5_year_temp pd5yr on p.country_id = pd5yr.country_id and p.year = pd5yr.year
+SET p.start_15 = pd5yr.population
+WHERE  pd5yr.start_age = 15;
+
+UPDATE population_dist p
+    INNER JOIN population_dist5_year_temp pd5yr on p.country_id = pd5yr.country_id and p.year = pd5yr.year
+SET p.start_20 = pd5yr.population
+WHERE  pd5yr.start_age = 20;
+
+UPDATE population_dist p
+    INNER JOIN population_dist5_year_temp pd5yr on p.country_id = pd5yr.country_id and p.year = pd5yr.year
+SET p.start_25 = pd5yr.population
+WHERE  pd5yr.start_age = 25;
+
+UPDATE population_dist p
+    INNER JOIN population_dist5_year_temp pd5yr on p.country_id = pd5yr.country_id and p.year = pd5yr.year
+SET p.start_30 = pd5yr.population
+WHERE  pd5yr.start_age = 30;
+
+UPDATE population_dist p
+    INNER JOIN population_dist5_year_temp pd5yr on p.country_id = pd5yr.country_id and p.year = pd5yr.year
+SET p.start_35 = pd5yr.population
+WHERE  pd5yr.start_age = 35;
+
+UPDATE population_dist p
+    INNER JOIN population_dist5_year_temp pd5yr on p.country_id = pd5yr.country_id and p.year = pd5yr.year
+SET p.start_40 = pd5yr.population
+WHERE  pd5yr.start_age = 40;
+
+UPDATE population_dist p
+    INNER JOIN population_dist5_year_temp pd5yr on p.country_id = pd5yr.country_id and p.year = pd5yr.year
+SET p.start_45 = pd5yr.population
+WHERE  pd5yr.start_age = 45;
+
+UPDATE population_dist p
+    INNER JOIN population_dist5_year_temp pd5yr on p.country_id = pd5yr.country_id and p.year = pd5yr.year
+SET p.start_50 = pd5yr.population
+WHERE  pd5yr.start_age = 50;
+
+UPDATE population_dist p
+    INNER JOIN population_dist5_year_temp pd5yr on p.country_id = pd5yr.country_id and p.year = pd5yr.year
+SET p.start_55 = pd5yr.population
+WHERE  pd5yr.start_age = 55;
+
+UPDATE population_dist p
+    INNER JOIN population_dist5_year_temp pd5yr on p.country_id = pd5yr.country_id and p.year = pd5yr.year
+SET p.start_60 = pd5yr.population
+WHERE  pd5yr.start_age = 60;
+
+UPDATE population_dist p
+    INNER JOIN population_dist5_year_temp pd5yr on p.country_id = pd5yr.country_id and p.year = pd5yr.year
+SET p.start_65 = pd5yr.population
+WHERE  pd5yr.start_age = 65;
+
+UPDATE population_dist p
+    INNER JOIN population_dist5_year_temp pd5yr on p.country_id = pd5yr.country_id and p.year = pd5yr.year
+SET p.start_70 = pd5yr.population
+WHERE  pd5yr.start_age = 70;
+
+UPDATE population_dist p
+    INNER JOIN population_dist5_year_temp pd5yr on p.country_id = pd5yr.country_id and p.year = pd5yr.year
+SET p.start_75 = pd5yr.population
+WHERE  pd5yr.start_age = 75;
+
+UPDATE population_dist p
+    INNER JOIN population_dist5_year_temp pd5yr on p.country_id = pd5yr.country_id and p.year = pd5yr.year
+SET p.start_80 = pd5yr.population
+WHERE  pd5yr.start_age = 80;
+
+UPDATE population_dist p
+    INNER JOIN population_dist5_year_temp pd5yr on p.country_id = pd5yr.country_id and p.year = pd5yr.year
+SET p.start_85 = pd5yr.population
+WHERE  pd5yr.start_age = 85;
+
+UPDATE population_dist p
+    INNER JOIN population_dist5_year_temp pd5yr on p.country_id = pd5yr.country_id and p.year = pd5yr.year
+SET p.start_90 = pd5yr.population
+WHERE  pd5yr.start_age = 90;
+
+UPDATE population_dist p
+    INNER JOIN population_dist5_year_temp pd5yr on p.country_id = pd5yr.country_id and p.year = pd5yr.year
+SET p.start_95 = pd5yr.population
+WHERE  pd5yr.start_age = 95;
+
+UPDATE population_dist p
+    INNER JOIN population_dist5_year_temp pd5yr on p.country_id = pd5yr.country_id and p.year = pd5yr.year
+SET p.start_100 = pd5yr.population
+WHERE  pd5yr.start_age = 100;
+
+drop table population_dist5_year_temp;
 --
 --
 -- :)

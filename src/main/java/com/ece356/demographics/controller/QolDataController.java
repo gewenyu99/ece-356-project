@@ -2,11 +2,7 @@ package com.ece356.demographics.controller;
 
 import com.ece356.demographics.DemographicsApplication;
 import com.ece356.demographics.dao.QolDataDao;
-import com.ece356.demographics.dao.QolDataDao;
-import com.ece356.demographics.model.PopulationDist5YearRange;
 import com.ece356.demographics.model.QolData;
-import com.ece356.demographics.model.QolData;
-import com.ece356.demographics.service.QolDataService;
 import com.ece356.demographics.service.QolDataService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jdbi.v3.core.Jdbi;

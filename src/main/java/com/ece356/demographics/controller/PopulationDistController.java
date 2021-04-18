@@ -1,14 +1,8 @@
 package com.ece356.demographics.controller;
 
 import com.ece356.demographics.DemographicsApplication;
-import com.ece356.demographics.dao.CountryDao;
-import com.ece356.demographics.dao.PopulationDataDao;
 import com.ece356.demographics.dao.PopulationDistDao;
-import com.ece356.demographics.model.Country;
-import com.ece356.demographics.model.PopulationData;
 import com.ece356.demographics.model.PopulationDist;
-import com.ece356.demographics.model.PopulationDist5YearRange;
-import com.ece356.demographics.service.CountryService;
 import com.ece356.demographics.service.PopulationDistService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jdbi.v3.core.Jdbi;
@@ -55,7 +49,12 @@ public class PopulationDistController {
     @PostMapping(value = "/create/populationDist")
     public String create(@RequestBody PopulationDist populationDist) {
         try {
-            jdbi.useExtension(PopulationDistDao.class, dao -> dao.createPopulationDist(populationDist.getCountryId(), populationDist.getYear(), populationDist.getAge(), populationDist.getPopulation()));
+            jdbi.useExtension(PopulationDistDao.class, dao -> dao.createPopulationDist(populationDist.getCountryId(), populationDist.getYear(),
+                    populationDist.start_0, populationDist.start_5, populationDist.start_10, populationDist.start_15, populationDist.start_20,
+                    populationDist.start_25, populationDist.start_30, populationDist.start_35, populationDist.start_40,
+                    populationDist.start_45, populationDist.start_50, populationDist.start_55, populationDist.start_60,
+                    populationDist.start_65, populationDist.start_70, populationDist.start_75, populationDist.start_80,
+                    populationDist.start_85, populationDist.start_90, populationDist.start_95, populationDist.start_100));
         } catch (Exception e) {
             return e.toString();
         }
