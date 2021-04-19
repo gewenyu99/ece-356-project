@@ -38,6 +38,6 @@ public class QolDataService {
 
     public void deleteQolData(String id, long year) {
         QolData qolData = getQolData(id, year);
-        qolDataRepository.delete(qolData);
+        qolDataRepository.delete(id, year);
     }
 }

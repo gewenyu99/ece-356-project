@@ -38,6 +38,6 @@ public class PopulationDataService {
 
     public void deletePopulationData(String id, long year) {
         PopulationData populationData = getPopulationData(id, year);
-        populationDataRepository.delete(populationData);
+        populationDataRepository.delete(id, year);
     }
 }

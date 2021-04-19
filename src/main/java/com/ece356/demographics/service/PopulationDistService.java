@@ -55,6 +55,6 @@ public class PopulationDistService {
 
     public void deletePopulationDist(String id, long year) {
         PopulationDist populationDist = getPopulationDist(id, year);
-        populationDistRepository.delete(populationDist);
+        populationDistRepository.delete(id, year);
     }
 }
