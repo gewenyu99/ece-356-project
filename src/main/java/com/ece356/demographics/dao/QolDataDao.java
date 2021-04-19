@@ -12,7 +12,7 @@ import java.util.List;
 
 @RegisterBeanMapper(QolData.class)
 public interface QolDataDao {
-    @SqlQuery("SELECT * FROM qol_data WHERE countryID in (<idList>) ORDER BY year,age LIMIT 30 OFFSET :pageOffset;")
+    @SqlQuery("SELECT * FROM qol_data WHERE country_id in (<idList>) ORDER BY year LIMIT 30 OFFSET :pageOffset;")
     List<QolData> getQolData(@BindList("idList") List<String> idList,
                              @Bind("pageOffset") int pageOffset);
 
