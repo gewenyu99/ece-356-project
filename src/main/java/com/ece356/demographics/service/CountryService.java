@@ -18,17 +18,8 @@ public class CountryService {
         return countryResponse.orElse(null);
     }
 
-    public Country addCountry(Country country) {
-        return countryRepository.save(country);
-    }
-
-    public Country addCountry(String countryID, String countryName) {
-        Country country = new Country(countryID, countryName);
-        return countryRepository.save(country);
-    }
-
     public Country updateCountry(Country country) {
-        String countryID = country.getCountryID();
+        String countryID = country.getCountryId();
         Country findCountry = getCountry(countryID);
         findCountry.setCountryName(country.getCountryName());
         return countryRepository.save(findCountry);

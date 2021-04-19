@@ -1,7 +1,7 @@
 package com.ece356.demographics.model;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Column;
 
 public class Country {
 
@@ -17,17 +17,12 @@ public class Country {
     private String countryId;
     private String countryName;
 
-    public Country(String countryId, String countryName) {
-        this.countryId = countryId;
-        this.countryName = countryName;
-    }
-
-    public String getCountryID() {
+    public String getCountryId() {
         return countryId;
     }
 
-    public void setCountryId(String countryID) {
-        this.countryId = countryID;
+    public void setCountryId(String countryId) {
+        this.countryId = countryId;
     }
 
     public String getCountryName() {

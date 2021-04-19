@@ -46,7 +46,7 @@ public class CountryController {
     @PostMapping(value = "/create/country")
     public String create(@RequestBody Country country) {
         try {
-            jdbi.useExtension(CountryDao.class, dao -> dao.createCountry(country.getCountryID(), country.getCountryName()));
+            jdbi.useExtension(CountryDao.class, dao -> dao.createCountry(country.getCountryId(), country.getCountryName()));
             //countryService.addCountry(country);
         } catch (Exception e) {
             return e.toString();

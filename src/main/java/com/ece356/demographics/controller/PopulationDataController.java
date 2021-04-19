@@ -34,7 +34,7 @@ public class PopulationDataController {
         this.populationDataService = populationDataService;
     }
 
-    @RequestMapping(value = "/data/populationData", method = GET)
+    @RequestMapping(value = "/data/populationData/list", method = GET)
     public List<PopulationData> populationData(@RequestParam(value="countryIDs", required=false) String[] idList,
                                                @RequestParam(value="page", required=false, defaultValue = "1") int page) {
         if(idList == null){
