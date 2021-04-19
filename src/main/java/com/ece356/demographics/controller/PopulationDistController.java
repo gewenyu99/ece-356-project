@@ -31,7 +31,7 @@ public class PopulationDistController {
         this.populationDistService = populationDistService;
     }
 
-    @RequestMapping(value = "/data/populationDist", method = GET)
+    @RequestMapping(value = "/data/populationDist/list", method = GET)
     public List<PopulationDist> populationDist(@RequestParam(value="countryIDs", required=false) String[] idList,
                                                @RequestParam(value="page", required=false, defaultValue = "1") int page) {
         if(idList == null){

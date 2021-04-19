@@ -31,7 +31,7 @@ public class QolDataController {
         this.qolDataService = qolDataService;
     }
 
-    @RequestMapping(value = "/data/qolData", method = GET)
+    @RequestMapping(value = "/data/qolData/list", method = GET)
     public List<QolData> qolData(@RequestParam(value = "countryIDs", required = false) String[] idList,
                                  @RequestParam(value = "page", required = false, defaultValue = "1") int page) {
         if (idList == null) {
