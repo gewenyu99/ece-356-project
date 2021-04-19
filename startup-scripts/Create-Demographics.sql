@@ -3,6 +3,8 @@ drop table if exists ix_auth_username;
 drop table if exists authorities;
 drop table if exists users;
 
+
+drop view if exists  country_data_aggregation;
 drop table if exists population_data;
 drop table if exists population_dist;
 drop table if exists population_dist5_year_range;
@@ -358,8 +360,8 @@ drop table tempHDI;
 create table tempLocation
 (
     country_name char(50),
-    latitude   float,
-    longitude  float
+    latitude     float,
+    longitude    float
 );
 
 load data infile '/mnt/Country-Location.csv' ignore into table tempLocation
@@ -377,7 +379,10 @@ create table country_location
     longitude  float
 );
 
-insert into country_location (country_id, latitude, longitude) SELECT c.country_id, t.latitude, t.longitude from tempLocation t inner join country c on t.country_name = c.country_name;
+insert into country_location (country_id, latitude, longitude)
+SELECT c.country_id, t.latitude, t.longitude
+from tempLocation t
+         inner join country c on t.country_name = c.country_name;
 
 
 drop table tempLocation;
@@ -387,3 +392,20 @@ AS
 SELECT c.country_id, c.country_name, cl.latitude, cl.longitude
 from country_location cl
          inner join country c on cl.country_id = c.country_id;
+
+CREATE VIEW country_data_aggregation
+            (country_id, country_name, year, birth_rate, death_rate, total_population, hdi,
+             life_expectancy, survival_to_age65)
+AS
+SELECT c.country_id,
+       c.country_name,
+       pd.year,
+       pd.birth_rate,
+       pd.death_rate,
+       pd.total_population,
+       qd.hdi,
+       qd.life_expectancy,
+       qd.survival_to_age65
+from country c
+         inner join qol_data qd on c.country_id = qd.country_id and qd.hdi > 0
+         inner join population_data pd on c.country_id = pd.country_id and qd.year = pd.year;
